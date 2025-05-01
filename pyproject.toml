@@ -1,13 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "tinicly"
-version = "0.1.0"
-description = "CLI for tinifying images and checking they're tinified"
+version = "0.1.1"
+description = "CLI for tinifying images and checking they're tinified."
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "httpx>=0.28.1",
-    "pillow>=11.2.1",
+authors = [{ name = "Samuel Colvin", email = "samuel@pydantic.dev" }]
+license = "MIT"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Internet",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+requires-python = ">=3.11"
+dependencies = ["httpx>=0.28.1", "pillow>=11.2.1"]
+
+[project.urls]
+Homepage = "https://github.com/samuelcolvin/tinicly"
+Source = "https://github.com/samuelcolvin/tinicly"
 
 [project.scripts]
 tinicly = "tinicly.__main__:main"
@@ -15,18 +38,10 @@ tinicly = "tinicly.__main__:main"
 [tool.ruff]
 line-length = 120
 target-version = "py313"
-include = [
-    "tinicly/**/*.py",
-]
+include = ["tinicly/**/*.py"]
 
 [tool.ruff.lint]
-extend-select = [
-    "Q",
-    "RUF100",
-    "C90",
-    "UP",
-    "I",
-]
+extend-select = ["Q", "RUF100", "C90", "UP", "I"]
 flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
 isort = { combine-as-imports = true }
 mccabe = { max-complexity = 15 }
@@ -43,15 +58,8 @@ quote-style = "single"
 pythonVersion = "3.13"
 typeCheckingMode = "strict"
 reportUnnecessaryTypeIgnoreComment = true
-include = [
-    "tinicly",
-]
+include = ["tinicly"]
 venvPath = ".venv"
 
 [dependency-groups]
-dev = [
-    "devtools>=0.12.2",
-    "ipython>=9.1.0",
-    "pyright>=1.1.399",
-    "ruff>=0.11.5",
-]
+dev = ["devtools>=0.12.2", "ipython>=9.1.0", "pyright>=1.1.399", "ruff>=0.11.5"]

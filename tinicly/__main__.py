@@ -10,8 +10,6 @@ from pathlib import Path
 import httpx
 from PIL import Image
 
-__version__ = '0.1.0'
-
 
 def main():
     sys.exit(asyncio.run(amain()))
@@ -30,8 +28,6 @@ Version: {metadata_version(prog)}
     )
 
     parser.add_argument('path', type=Path, help='The path to the files.')
-
-    # Optional flags
     parser.add_argument('--token', help="The Tinify API token, falls back to the 'TINIFY_KEY' env variable.")
     parser.add_argument('--check', action='store_true', help='Check if files are tiny; fail if not.')
 
@@ -127,7 +123,6 @@ class Tinify:
         for g in '**/*.png', '**/*.jpeg', '**/*.jpg':
             file_paths.extend(dir_path.glob(g))
         await asyncio.gather(*[self.tinify_file(file) for file in file_paths])
-
 
 
 if __name__ == '__main__':
