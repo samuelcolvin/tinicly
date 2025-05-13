@@ -8,3 +8,5 @@ wheels/
 
 # Virtual environments
 .venv
+pypi_api_key
+/*.png

@@ -6,9 +6,13 @@ from concurrent.futures import Executor, ThreadPoolExecutor
 from dataclasses import dataclass
 from importlib.metadata import version as metadata_version
 from pathlib import Path
+from typing import Any
 
 import httpx
 from PIL import Image
+
+SUCCESS = '✅'
+FAILURE = '❌'
 
 
 def main():
@@ -17,12 +21,13 @@ def main():
 
 async def amain() -> int:
     prog = 'tinicly'
+    version = metadata_version(prog)
     parser = argparse.ArgumentParser(
         prog=prog,
         description=f"""\
 CLI for tinifying images with https://tinify.com/ and checking they're tinified.
 
-Version: {metadata_version(prog)}
+Version: {version}
 """,
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -38,8 +43,13 @@ Version: {metadata_version(prog)}
     else:
         token = args.token or os.environ.get('TINIFY_KEY')
         if not token:
-            print('❎ No token provided, and TINIFY_KEY not set')
+            print(f'{FAILURE} No token provided, and TINIFY_KEY not set')
             return 1
+
+    if args.check:
+        print(f'tinicly v{version}. Checking files have been tinified with https://tinify.com/...')
+    else:
+        print(f'tinicly v{version}. Tinifying files with https://tinify.com/...')
 
     with ThreadPoolExecutor() as executor:
         async with httpx.AsyncClient() as client:
@@ -81,17 +91,18 @@ class Tinify:
         elif path.is_dir():
             await self.tinify_dir(path)
         else:
-            print(f'❎ {path} does not exist')
+            print(f'{FAILURE} {path} does not exist')
             return 1
 
         if self.check:
             if self.tiny:
-                print(f'❎ {self.already} files already tiny, {self.tiny} are not tiny')
+                print(f'{FAILURE} {self.already} files already tiny, {self.tiny} are not tiny.')
+                print(f'  Run `uvx tinicly {path}` to tinify those files.')
                 return 1
             else:
-                print(f'✅ {self.already} files already tiny, no files to tinify')
+                print(f'{SUCCESS} {self.already} files already tiny, no files to tinify')
         else:
-            print(f'✅ {self.already} files already tiny, {self.tiny} tinified')
+            print(f'{SUCCESS} {self.already} files already tiny, {self.tiny} tinified')
         return 0
 
     async def tinify_file(self, image_path: Path):
@@ -100,7 +111,8 @@ class Tinify:
         already = await loop.run_in_executor(self.executor, already_tiny, image_path)
         if already:
             self.already += 1
-            print(f'already tiny: {image_path}', flush=True)
+            if not self.check:
+                print(f'already tiny: {image_path}', flush=True)
         elif self.check:
             print(f'not tinified: {image_path}', flush=True)
             self.tiny += 1
@@ -114,7 +126,10 @@ class Tinify:
             r = await self.client.get(r.headers['location'])
             r.raise_for_status()
             await loop.run_in_executor(self.executor, image_path.write_bytes, r.content)
-            print(f' tinified ok: {image_path}', flush=True)
+
+            original_size = len(image_content)
+            size_reduction = (original_size - len(r.content)) / original_size
+            print(f' tinified ok: {image_path} (↓ {size_reduction:.0%})', flush=True)
             self.tiny += 1
 
     async def tinify_dir(self, dir_path: Path):
