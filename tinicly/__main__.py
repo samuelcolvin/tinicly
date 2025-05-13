@@ -94,6 +94,7 @@ class Tinify:
             print(f'{FAILURE} {path} does not exist')
             return 1
 
+        print('')
         if self.check:
             if self.tiny:
                 print(f'{FAILURE} {self.already} files already tiny, {self.tiny} are not tiny.')
